@@ -1,0 +1,28 @@
+FT	ID	AT	WT	ST
+9	21	8	0	1
+10	4	8	0	2
+19	5	12	0	7
+20	46	19	0	1
+..................................
+..................................
+Region A:
+	Orders:0	[Norm:  0, Froz:  0, VIP:  0]
+	MotorC:14	[Norm:  4, Froz:  6, VIP:  4]
+..................................
+..................................
+Region B:
+	Orders:2	[Norm:  1, Froz:  2, VIP:  2]
+	MotorC:9	[Norm:  5, Froz:  3, VIP:  1]
+	Avg Wait = 0,	Avg Serv = 1
+..................................
+..................................
+Region C:
+	Orders:1	[Norm:  0, Froz:  1, VIP:  0]
+	MotorC:13	[Norm:  5, Froz:  4, VIP:  4]
+	Avg Wait = 0,	Avg Serv = 7
+..................................
+..................................
+Region D:
+	Orders:1	[Norm:  0, Froz:  1, VIP:  1]
+	MotorC:5	[Norm:  3, Froz:  2, VIP:  0]
+	Avg Wait = 0,	Avg Serv = 1
