@@ -1,20 +1,46 @@
-The program will receive a list of orders as input. This list represents the scenario to be simulated. For each order, 
-the system will receive the following information:
-- Arrival Time Stamp: When the order was made. - Order Type: There are 3 types of orders: VIP orders, Frozen orders and Normal orders.
-• VIP orders must be serviced first before frozen and normal orders.
-• Frozen orders are the orders that needs to be delivered using motorcycles with refrigerators (Frozen Motorcycles) to keep its temperature.
-• Normal orders are the orders that neither VIP nor Frozen.
-- Order Region: the restaurant has 4 branches. Each branch is in a different region. The Order Region indicates the region of 
-the order and hence the branch that should deliver the order to the customer.
-- Order Distance: the distance between the restaurant and the order location (in meters).
-- Order Money: the total order money the customer should pay.
+# Restaurant Management Application
 
-- Motorcycle Type: There are 3 types: Fast motorcycles, Frozen motorcycles and Normal motorcycles.
-• Fast motorcycles are motorcycles with higher speed level.
-• Frozen motorcycles are the motorcycles that have small refrigerator to save food in.
-• Normal motorcycles are the motorcycles that neither Fast nor Frozen.
-- Motorcycle Region: the branch or the region of this motorcycle (from which the motorcycle starts its delivery and to which it returns after delivery).
-- The Motorcycle speed (the number of meters it can move in one timestep) is the same for all motorcycles of the same type.
+This is a database management application for a restaurant written in C++. It provides functionalities to manage various aspects of the restaurant including menu items, orders, reservations, and customer information.
+This project is an implementation of queues, priority queues, stacks and linked lists data structurs from scratch where each order logic maps to an approproate DS. 
 
-In this project i implemented Lists, Qeues,Priority Qeues and Linked lists from strach and and assigned each of them with their sutabile objec to 
-achieve the pirpose of the project.
+## Features
+
+- **Menu Management**: Add, update, and delete menu items with details such as name, price, and category.
+- **Order Management**: Take and manage orders, including adding/removing items, calculating total amount, and marking orders as completed.
+- **Reservation Management**: Reserve tables for customers, with options to specify date, time, and number of guests.
+- **Customer Management**: Maintain customer information, including contact details and order history.
+
+## Prerequisites
+
+- C++ compiler (supporting C++11 or later)
+- Standard Template Library (STL)
+
+## Installation
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/aayymann/Datastrucrues-of-C-plus-plus.git
+    ```
+
+2. Compile the source code:
+
+    ```bash
+    g++ -o restaurant_app main.cpp menu.cpp order.cpp reservation.cpp customer.cpp -lsqlite3
+    ```
+
+3. Run the application:
+
+    ```bash
+    ./restaurant_app
+    ```
+
+## Usage
+
+1. **Main Menu**: Upon running the application, you will be presented with a main menu with options to manage menu items, orders, reservations, and customers.
+2. **Menu Management**: Choose option to manage menu items to add, update, or delete items.
+3. **Order Management**: Select option to manage orders to take and process orders.
+4. **Reservation Management**: Choose option to manage reservations to make or cancel reservations.
+5. **Customer Management**: Select option to manage customers to view or update customer information.
+6. **Exit**: Choose option to exit the application.
+
