@@ -1,98 +1,69 @@
-#pragma once
-#include "..\Restaurant\Rest\Motorcycle.h"
-#include "..\Restaurant\GUI\GUI.h"
-#include"..\Restaurant\List.h"
-#include"..\Restaurant\VIPPQ.h"
-#include "..\Restaurant\Rest\Order.h"
-#include "MCPQ.h"
-#include"MCSpeedPQ.h"
-#include"RestingMotorsPQ.h"
-#include"FOPQ.h"
+#ifndef _REGION_H_
+#define _REGION_H_
 
-class Region {
+#include"Generic_DS/Queue.h"
+#include"PriorityQueue.h"
+#include"List.h"
+#include"Rest/Order.h"
+#include"GUI/GUI.h"
+
+#include"VIPOrdersComp.h"
+#include"MotorCyclesComp.h"
+#include"RestingMotorsComp.h"
+#include"InServiceMotorsComp.h"
+#include"FinishedOrdersComp.h"
+
+class Region
+{
 private:
+	int PromotionLimit;  // Time at which Normal Orders are Promoted to VIP orders
+	int AvgWaitingTime, AvgServiceTime; 
+
+	///Orders related data members
 	List<Order*> NormalOrders;
-	VIPPQ VIPQueue;
 	Queue<Order*> FrozenOrders;
+	PriorityQueue<Order*, VIPOrdersComp> VipOrders;
+	List<Order*> FinishedOrders[3]; //FinishedOrders[TYPE_NRM],	FinishedOrders[TYPE_FROZ],	FinishedOrders[TYPE_VIP]
+	int NumNormal, NumVIP, NumFrozen; // Number of Normal, VIP, Frozen orders
+	
+	///Motorcycles related data members
+	PriorityQueue<Motorcycle*, MotorCyclesComp> NormalMotors, FastMotors, FrozenMotors;
+	PriorityQueue<Motorcycle*, RestingMotorsComp> RestingMotors;
+	int NumNormalMotors, NumFrozenMotors, NumFastMotors, NumRestingMotors;
+	PriorityQueue<Motorcycle*, InServiceMotorsComp> InServiceMC; // In service Motorcycles
 
-	int NormalOrder;
-	int VIPOrder;
-	int FrozenOrder;
-	List <Order*> FinishedOrders;
-	MCSpeedPQ NormalMotorCycles;
-	MCSpeedPQ FastMotorCycles;
-	MCSpeedPQ FrozenMotorCycles;
-	RestingMotorsPQ RestingMotors;
-
-	int NumofRestMotors;
-
-
-	MCPQ InServiceMC;
-	int FrozenMotorcycle;
-	int FastMotorCycle;
-	int NormalMotorCycle;
-	int AverageWaitingTime;
-	int AverageServiceTime;
-	int PromotionLimit;  // Time for Normal Orders to be Promoted Autimatically
-	List<Order*> NormalsDone;
-	List<Order*> VIPDone;
-	List<Order*> FrozensDone;
 public:
 	Region();
-	//Takes order and distributes due to Type, For Each Type
-	void HandleOrder(Order* pOrd);  
-	void CreateMotorcycle(int Speed,MC_TYPE type,int NumberofMC=1);
-	
-	void OrdersDone(int &Normal);
+	~Region();
 
-	//Prints Orders to the GUI
+	void SetPromotionLimit(int ts);
+	int GetPromotionLimits() const;
+
+	/// Orders related methods
+	void AddOrder(Order* pOrd); //Adds passed order object to it's container according to it's type
+	bool CancelOrder(int ID); //Cancel normal order if it's not assigned to a motor
+	bool PromoteOrder(int ID, double Extramny=0); //promote normal order to VIP order
+	void AutomaticPromotion(); // Automatically promote orders if their waiting time exceeds promotion limit
+	void IncrementOrdersWT();
 	void printOrders(GUI * pGUI);
 
-	//Assiging Motors to VIP orders with limitaions
-	void AssignVIPToMotorCycles(int ts);  
+	/// Motorcycles related methods
+	void CheckInServiceMC(int ts);
+	void CheckRestMC(int ts);
+	void CreateMotorCycles(ifstream &InputFile); // Create motorcycle objects from a file 
 
-	//Assiging Motors to NOrmal orders with limitaions
-	void AssignNormalToMotorCycles(int ts);  
+	/// Writing information methods
+	void FillInfo(string* Order, string* Motorcycle);	//Fill passed srings with Order and MotorCycle info
+	void WriteInfo(ofstream & Output);
+	int GetAvgWT() const;
+	int GetAvgServT() const;
+	int GetFinishedOrdersCount() const;
 
-	//Assiging Motors to Frozen orders with limitaions
-	void AssignMotorFrzoenToCycles(int ts);
-	
-	/* Call the 3 Assign Motors to be called in Reasturant
-	TO BE CHECKED IF ALL MOTORCYCLES ARE OUT WHEN WE HANDEL WAITING TIME*/
-	void AssignMotorCycles(int ts);   
-
-	//Cancels From Normal List Only according to region
-	bool CancelOrderRegion(int id);	
-
-	// Setting Promotion Limit to the Number Read from The Input File sent by the reasturant
-	void SetPromotionLimit(int pl);
-	int GetPromotionLimit();
-	Order* Promote(int id , int extraM=0);
-	
-	void TazbeetMakan(int ts);
-
-	//Automatically promote order if it's waiting time is bigger than promotion limit
-	void AutomaticPromotion();
-
-	//Fill passed srings with Order, MotorCycle and Time info
-	void GetInfo(string* Order, string* Motorcycle, string*Time);	
-
-
-	//Set waiting times of orders each timestep
-	void IncrementOrdersWT();
-
-	//Getter for AverageWaiting Time to be called in the Resturant
-	int GetAverageWaitingTime();
-
-
-	//Getter for AverageSerive Time to be called in the Resturant
-	int GetAverageServiceTime();
-	//to be called in he res  . to be called in every timestep in Interactive mode
-	int GetNumberOFFinishedOrders();
-
-	//to be called in Res
-	void DistibuteMotors(int ts);
-	void WriteFile(ofstream &OutFile);
-	void GetFinishedOrders(FOPQ& finishedOrders);
-	~Region();
+	/// Assign orders to motors methods 
+	void AssignMotorCycles(int ts);
+	void AssignMotorsToFrozen(int ts);
+	void AssignMotorsToNormal(int ts);
+	void AssignMotorsToVip(int ts);
 };
+
+#endif 

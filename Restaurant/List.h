@@ -1,164 +1,252 @@
-#pragma once
-#include <iostream>
-using namespace std;
-#include"Generic_DS/Node.h"
-template<class T>
-class List
-{
-	Node <T>* Head;
+#ifndef _LINKED_LIST_H_
+#define _LINKED_LIST_H_
+
+#include"Error.h"
+#include"Generic_DS\Node.h"
+
+template<typename T>
+class List {
+private:
 	int count;
-	Node <T>* GetPtr(T item)const;
+	Node<T>* Head;
+
+	/**
+	Get a pointer to the first node containing passed item
+	@return nullptrptr if the list doesn't contain the passed item
+	*/
+	Node<T>* GetPtr(T item)const;
+
 public:
-    List();
-	~List();
-	void Add(T item);
+	List();
+
+	// Add item to the first position in the list
+	void Insert(T item); 
 	void InsertEnd(T item);
 	bool Remove(T item);
 	bool DeleteAll();
-	bool IsHere(T item)const;
-	T GetItem(int ID);
-	bool PeekHead(T& item);   //Returns the item in the Head Node in Item and removes it
+	bool Contains(T item)const;
 	int GetCount()const;
-	void PrintList()const;
-	T GetItemByPosition(int i);
-	T PeekHead2();	//Returns the item in the Head Node in Item without removing
-};
-template<class T>
+
+	// Gets the first item in list and removes it 
+	bool PopHead(T& item);   
+
+	// Gets the first item in list 
+	bool PeekHead(T& item) const;	
+	bool isEmpty() const;
+
+	/**
+	Gets item by index
+	@throw OutOfRange error if index is out of range
+	*/
+	T GetItem(int pos) const;
+	~List();
+
+	class Iterator; //Forward declaration
+	Iterator begin();
+	Iterator end(); // End of LinkedList wrapped in Iterator type 
+
+}; //end List
+
+template<typename T>
+class List<T>::Iterator {
+private:
+	const Node<T>* currNode;
+
+public:
+	Iterator() : currNode(Head) { }
+
+	Iterator(const Node<T>* pNode) : currNode(pNode) { }
+
+	bool operator!=(const Iterator& iterator) { return currNode != iterator.currNode; }
+
+	bool operator==(const Iterator& iterator) { return currNode == iterator.currNode; }
+
+	T operator*() { return currNode->getItem(); }
+
+	Iterator& operator=(Node<T>* pNode)
+	{
+		this->currNode = pNode;
+		return *this;
+	}
+
+	// Prefix ++ overload 
+	Iterator& operator++() 
+	{
+		if (currNode)
+			currNode = currNode->getNext();
+		return *this;
+	}
+
+	// Postfix ++ overload
+	Iterator operator++(int) 
+	{
+		Iterator iter = *this;
+		++*this;
+		return iter;
+	}
+
+	Iterator& operator+(int i)
+	{
+		Iterator iter = *this;
+		while (i-- > 0 && iter.p)
+		{
+			++iter;
+		}
+		return iter;
+	}
+}; // end Iterator
+
+template<typename T>
+Node<T>* List<T>::GetPtr(T item) const
+{
+	Node<T>* temp = Head;
+	while (temp != nullptr)
+	{
+		if (temp->getItem() == item)
+		{
+			return temp;
+		}
+		temp = temp->getNext();
+	}
+	temp = nullptr;
+	return temp;
+}
+
+template<typename T>
 List<T>::List()
 {
 	count = 0;
 	Head = nullptr;
 }
-template<class T>
-void List<T> :: Add(T item)
+
+template<typename T>
+void List<T> ::Insert(T item)
 {
-	Node <T>*A = new Node<T>;
-	A->setItem(item);
-	A->setNext(Head);
-	Head = A;
+	Node<T>* NewNode = new Node<T>;
+	NewNode->setItem(item);
+	NewNode->setNext(Head);
+	Head = NewNode;
 	count++;
-
-
 }
-template<class T>
 
-T List<T> :: GetItem(int ID)
+template<typename T>
+T List<T> ::GetItem(int pos) const
 {
-	Node<T> * temp = Head;
-	while (temp != NULL)
-	{
-		if (temp->getItem()->GetID() == ID)
-		{
-			return temp->getItem();
-		}
-		temp = temp->getNext();
+	if (pos > count || pos < 0)
+		throw error::OUT_OF_RANGE;
+
+	Node<T>* temp = Head;
+	for (int i = 1; i <= count; i++) {
+		if (i == pos)
+			break;
+		else
+			temp = temp->getNext();
 	}
-	return NULL;
+	return temp->getItem();
 }
-template<class T>
-bool List<T>::PeekHead(T & item)
+
+template<typename T>
+bool List<T>::PopHead(T & item)
 {
 	if (Head) {
 		item = Head->getItem();
 		return Remove(Head->getItem());
 	}
-	else {
-		item = NULL;
+	else
 		return false;
-	}
 }
-template<class T>
+
+template<typename T>
 void  List<T> ::InsertEnd(T item)
 {
-	Node<T>* A = new Node<T>;
-	A->setItem(item);
-	A->setNext(nullptr);
-	Node<T>* temp = Head;
-	if (temp == nullptr)
+	Node<T>* NewNode = new Node<T>(item, nullptr);
+
+	if (count == 0)
 	{
-		Head = A;
+		Head = NewNode;
 		count++;
 		return;
 	}
+
+	Node<T>* temp = Head;
 	while (temp) {
 		if (temp->getNext() == nullptr)
 			break;
 		else
-		temp=temp->getNext();
+			temp = temp->getNext();
 	}
-	temp->setNext(A);
+	temp->setNext(NewNode);
 	count++;
+	return;
 }
-template<class T>
-bool List<T>:: Remove(T item) //Modified
+
+template<typename T>
+bool List<T>::Remove(T item)
 {
-	Node<T> * prev = Head;
-	Node<T> * curr = Head;
-	if(Head==NULL)
+	if (Head == nullptr)
 		return false;
-	else
+
+	Node<T>* prev = Head;
+	Node<T>* curr = Head;
+
+	if (Head->getItem() == item) //if the item is the first in the list
 	{
-		if(Head->getItem()==item)
+		if (Head->getNext() != nullptr)
 		{
-			if(Head->getNext()!=NULL)
-			{
-				Head = Head->getNext();
-				delete curr;
-				prev = Head;
-				curr = prev;
-				count--;
-				return true;
-			}
-			else
-			{
-				delete Head;
-				Head = NULL;
-				curr = NULL;
-				prev = NULL;
-				count--;
-				return true;
-			}
+			Head = Head->getNext();
+			delete curr;
+			curr = nullptr;
+			prev = nullptr;
+			count--;
+			return true;
 		}
 		else
 		{
-			while(curr->getNext()!=NULL)
-			{
-				prev=curr;
-				curr = curr->getNext();
-				if(curr->getItem()==item)
-				{
-					prev ->setNext(curr->getNext());
-					delete curr;
-					curr = prev;
-					count--;
-					return true;
-				}
-			}
+			delete Head;
+			Head = nullptr;
+			curr = nullptr;
+			prev = nullptr;
+			count--;
+			return true;
 		}
-		return false;
 	}
+
+	while (curr->getNext() != nullptr)
+	{
+		prev = curr;
+		curr = curr->getNext();
+
+		if (curr->getItem() == item)
+		{
+			prev->setNext(curr->getNext());
+			delete curr;
+			curr = prev;
+			count--;
+			return true;
+		}
+	}
+
+	return false; //if the item is not found
 }
-template<class T>
-bool List<T>:: DeleteAll()
+
+template<typename T>
+bool List<T>::DeleteAll()
 {
-	Node <T> * temp;
+	Node<T>* temp;
 	temp = Head;
-	while (temp != NULL)
+	while (temp != nullptr)
 	{
 		temp = Head->getNext();
 		delete Head;
 		Head = temp;
 		count--;
-
 	}
-	if (count == 0)
-		return true;
-	else
-		return false;
 
+	return true;
 }
-template<class T>
-bool List<T>:: IsHere(T item)const
+
+template<typename T>
+bool List<T>::Contains(T item)const
 {
 	if (GetPtr(item))
 		return true;
@@ -166,75 +254,47 @@ bool List<T>:: IsHere(T item)const
 		return false;
 }
 
-template<class T>
-int List<T>:: GetCount()const
+template<typename T>
+int List<T>::GetCount() const
 {
 	return count;
+}
 
-}
-template<class T>
-Node <T> * List<T> :: GetPtr(T item)const
+template<typename T>
+bool List<T>::PeekHead(T& item) const
 {
-	Node<T> * temp = Head;
-	while (temp != nullptr)
-	{
-		if (temp->getItem() == item)
-		{
-			return temp;
-		}
-		temp=temp->getNext();
-		
+	if (Head) {
+		item = Head->getItem();
+		return true;
 	}
-	temp = nullptr;
-	return temp;
-}
-template<class T>
-void List<T>::PrintList() const{
-	Node<T>* temp=Head;
-	if (Head == NULL) {
-		cout << "List is clear!" << endl;
-		return;
-	}
-	cout << "count=" << count<<endl;
-	while (temp) {
-		cout << temp->getItem() << "   ";
-		temp = temp->getNext();
-	}
-	cout << endl;
-}
-template<class T>
-T List<T>::GetItemByPosition(int i)
-{
-	Node<T>*A = Head;
-	if (i > count || i<0) {
-		return NULL;
-	}
-	for (int j = 1; j <= count; j++) {
-		if (j == i) 
-		{
-			return A->getItem();
-		}
-		else {
-			A = A->getNext();
-		}
+	else {
+		item = nullptr;
+		return false;
 	}
 }
-template<class T>
-T List<T>::PeekHead2()
-{
-	if (Head == NULL)
-	{
-		return NULL;
-	}
-	else
-	{
-		return Head->getItem();
-	}
 
+template<typename T>
+bool List<T>::isEmpty() const
+{
+	return count == 0;
 }
-template<class T>
+
+template<typename T>
 List <T>::~List()
 {
 	DeleteAll();
 }
 
+template<typename T>
+typename List<T>::Iterator List<T>::begin()
+{
+	return Iterator(Head);
+}
+
+template<typename T>
+typename List<T>::Iterator List<T>::end()
+{
+	return Iterator(nullptr);
+}
+
+#endif

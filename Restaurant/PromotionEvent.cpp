@@ -1,12 +1,15 @@
 #include "PromotionEvent.h"
+#include"Rest/Restaurant.h"
 
-
-PromotionEvent::PromotionEvent(int Ts, int ID, int Extramoney) :Event(Ts, ID) {
-	ExtraMoney = Extramoney;
+PromotionEvent::PromotionEvent(int eTime, int ID, double Extramoney) : ExtraMoney(Extramoney), Event(eTime, ID)
+{
 }
 
-
-void PromotionEvent::Execute(Restaurant* pRest)
+void PromotionEvent::Execute(Restaurant * pRest)
 {
-	pRest->PromoteOrder(Event::OrderID, ExtraMoney);
+	pRest->PromoteOrder(OrderID, ExtraMoney);
+}
+
+PromotionEvent::~PromotionEvent()
+{
 }

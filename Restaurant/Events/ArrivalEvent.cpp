@@ -2,38 +2,64 @@
 #include "..\Rest\Restaurant.h"
 
 
-ArrivalEvent::ArrivalEvent(int eTime, int oID, ORD_TYPE oType, REGION reg, int distance, double money):Event(eTime, oID)
+ArrivalEvent::ArrivalEvent(int eTime, int oID, ORD_TYPE typ, REGION reg): OrdType(typ), OrdRegion(reg), Event(eTime, oID)
 {
 
-	OrdType = oType;
-	OrdRegion = reg;
-	OrdDistance = distance;
-	OrdMoney = money;
 }
 
-ORD_TYPE ArrivalEvent::getOrderType() const
+ArrivalEvent::ArrivalEvent(int eTime, int oID, ORD_TYPE typ, REGION reg, int dist, double mny) : OrdType(typ), OrdRegion(reg),
+OrdDistance(dist), OrdMoney(mny), Event(eTime, oID)
 {
-	return OrdType;
+
 }
 
 void ArrivalEvent::Execute(Restaurant* pRest)
 {
-	//This function should create and order and and fills its data 
-	// Then adds it to normal, frozen, or VIP order lists that you will create in phase1
-	Order* pOrd = new Order(OrderID, OrdType, OrdRegion,OrdDistance,OrdMoney);
+	Order* pOrd = new Order(OrderID,OrdType,OrdRegion, OrdDistance, OrdMoney);
+	pOrd->SetArrtime(EventTime);
 	pRest->AddOrder(pOrd);
-	pOrd->SetArrtime(Event::EventTime);
-	
-	///For the sake of demo, this function will just create an order and add it to DemoQueue
-	///Remove the next code lines in phase 1&2
-
-
-//	pRest->AddtoDemoQueue(pOrd);
 }
 
-int ArrivalEvent::GetDist() const {
+int ArrivalEvent::GetOrdDistance() const
+{
 	return OrdDistance;
 }
-double ArrivalEvent::GetOrdMoney() const {
+
+bool ArrivalEvent::SetOrdDistance(int dist)
+{
+	OrdDistance = dist;
+	return true;
+}
+
+ORD_TYPE ArrivalEvent::GetOrdType() const
+{
+	return OrdType;
+}
+
+bool ArrivalEvent::SetOrdType(ORD_TYPE typ)
+{
+	OrdType = typ;
+	return true;
+}
+
+REGION ArrivalEvent::GetOrdRegion() const
+{
+	return OrdRegion;
+}
+
+bool ArrivalEvent::SetOrdRegion(REGION reg)
+{
+	OrdRegion = reg;
+	return true;
+}
+
+double ArrivalEvent::GetOrdMoney() const
+{
 	return OrdMoney;
+}
+
+bool ArrivalEvent::SetOrdMoney(double mny)
+{
+	OrdMoney = mny;
+	return true;
 }

@@ -98,23 +98,25 @@
     <ClInclude Include="CMUgraphicsLib\version.h" />
     <ClInclude Include="CMUgraphicsLib\windowinput.h" />
     <ClInclude Include="Defs.h" />
+    <ClInclude Include="Error.h" />
     <ClInclude Include="Events\ArrivalEvent.h" />
     <ClInclude Include="Events\Event.h" />
-    <ClInclude Include="FOPQ.h" />
+    <ClInclude Include="FinishedOrdersComp.h" />
     <ClInclude Include="Generic_DS\Node.h" />
     <ClInclude Include="Generic_DS\Queue.h" />
     <ClInclude Include="GUI\GUI.h" />
+    <ClInclude Include="InServiceMotorsComp.h" />
     <ClInclude Include="List.h" />
-    <ClInclude Include="MCPQ.h" />
-    <ClInclude Include="MCSpeedPQ.h" />
+    <ClInclude Include="Comparator.h" />
+    <ClInclude Include="MotorCyclesComp.h" />
     <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="PromotionEvent.h" />
     <ClInclude Include="Region.h" />
-    <ClInclude Include="RestingMotorsPQ.h" />
+    <ClInclude Include="RestingMotorsComp.h" />
     <ClInclude Include="Rest\Motorcycle.h" />
     <ClInclude Include="Rest\Order.h" />
     <ClInclude Include="Rest\Restaurant.h" />
-    <ClInclude Include="VIPPQ.h" />
+    <ClInclude Include="VIPOrdersComp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CancelEvent.cpp" />
@@ -153,20 +155,20 @@
     <ClCompile Include="CMUgraphicsLib\keyqueue.cpp" />
     <ClCompile Include="CMUgraphicsLib\mousequeue.cpp" />
     <ClCompile Include="CMUgraphicsLib\windowinput.cpp" />
-    <ClCompile Include="Demo_Main.cpp" />
+    <ClCompile Include="InServiceMotorsComp.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Events\Event.cpp" />
     <ClCompile Include="Events\ArrivalEvent.cpp" />
-    <ClCompile Include="FOPQ.cpp" />
+    <ClCompile Include="FinishedOrdersComp.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
-    <ClCompile Include="MCPQ.cpp" />
-    <ClCompile Include="MCSpeedPQ.cpp" />
+    <ClCompile Include="MotorCyclesComp.cpp" />
     <ClCompile Include="PromotionEvent.cpp" />
     <ClCompile Include="Region.cpp" />
-    <ClCompile Include="RestingMotorsPQ.cpp" />
+    <ClCompile Include="RestingMotorsComp.cpp" />
     <ClCompile Include="Rest\Motorcycle.cpp" />
     <ClCompile Include="Rest\Order.cpp" />
     <ClCompile Include="Rest\Restaurant.cpp" />
-    <ClCompile Include="VIPPQ.cpp" />
+    <ClCompile Include="VIPOrdersComp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMUgraphicsLib\Manual.txt" />

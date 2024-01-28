@@ -24,6 +24,9 @@
     <Filter Include="Generic_DS">
       <UniqueIdentifier>{f9c05740-74ef-4242-8f5c-c406c492135c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Concrete_DS">
+      <UniqueIdentifier>{50e6b37b-5b40-4a2b-bf6b-9872ab9da717}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Defs.h" />
@@ -108,39 +111,42 @@
     <ClInclude Include="Events\ArrivalEvent.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="CancelEvent.h">
-      <Filter>Events</Filter>
-    </ClInclude>
     <ClInclude Include="List.h">
       <Filter>Generic_DS</Filter>
     </ClInclude>
     <ClInclude Include="PriorityQueue.h">
       <Filter>Generic_DS</Filter>
     </ClInclude>
-    <ClInclude Include="VIPPQ.h">
+    <ClInclude Include="Comparator.h">
       <Filter>Generic_DS</Filter>
+    </ClInclude>
+    <ClInclude Include="CancelEvent.h">
+      <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="PromotionEvent.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="Error.h" />
+    <ClInclude Include="FinishedOrdersComp.h">
+      <Filter>Concrete_DS</Filter>
+    </ClInclude>
+    <ClInclude Include="VIPOrdersComp.h">
+      <Filter>Concrete_DS</Filter>
+    </ClInclude>
     <ClInclude Include="Region.h">
       <Filter>Restaurant</Filter>
     </ClInclude>
-    <ClInclude Include="MCPQ.h">
-      <Filter>Generic_DS</Filter>
+    <ClInclude Include="RestingMotorsComp.h">
+      <Filter>Concrete_DS</Filter>
     </ClInclude>
-    <ClInclude Include="MCSpeedPQ.h">
-      <Filter>Generic_DS</Filter>
+    <ClInclude Include="MotorCyclesComp.h">
+      <Filter>Concrete_DS</Filter>
     </ClInclude>
-    <ClInclude Include="RestingMotorsPQ.h">
-      <Filter>Generic_DS</Filter>
-    </ClInclude>
-    <ClInclude Include="FOPQ.h">
-      <Filter>Restaurant</Filter>
+    <ClInclude Include="InServiceMotorsComp.h">
+      <Filter>Concrete_DS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Demo_Main.cpp" />
     <ClCompile Include="CMUgraphicsLib\jpeg\jcomapi.c">
       <Filter>CMUGraphicsLib\JPEG</Filter>
     </ClCompile>
@@ -267,21 +273,28 @@
     <ClCompile Include="CancelEvent.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="VIPPQ.cpp" />
     <ClCompile Include="PromotionEvent.cpp">
       <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="FinishedOrdersComp.cpp">
+      <Filter>Concrete_DS</Filter>
+    </ClCompile>
+    <ClCompile Include="VIPOrdersComp.cpp">
+      <Filter>Concrete_DS</Filter>
+    </ClCompile>
+    <ClCompile Include="MotorCyclesComp.cpp">
+      <Filter>Concrete_DS</Filter>
+    </ClCompile>
+    <ClCompile Include="RestingMotorsComp.cpp">
+      <Filter>Concrete_DS</Filter>
     </ClCompile>
     <ClCompile Include="Region.cpp">
       <Filter>Restaurant</Filter>
     </ClCompile>
-    <ClCompile Include="MCPQ.cpp" />
-    <ClCompile Include="MCSpeedPQ.cpp">
-      <Filter>Generic_DS</Filter>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="InServiceMotorsComp.cpp">
+      <Filter>Concrete_DS</Filter>
     </ClCompile>
-    <ClCompile Include="RestingMotorsPQ.cpp">
-      <Filter>Generic_DS</Filter>
-    </ClCompile>
-    <ClCompile Include="FOPQ.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMUgraphicsLib\Manual.txt">

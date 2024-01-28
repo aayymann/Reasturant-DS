@@ -1,433 +1,433 @@
-#pragma once
 #include "Region.h"
 #include<fstream>
-//int Region::RestT = 2;   // zeyadaaa
-Region::Region()
-{
-	FrozenMotorcycle = 0;
-	FastMotorCycle = 0;
-	NormalMotorCycle = 0;
-	NormalOrder = 0;
-	FrozenOrder = 0;
-	VIPOrder = 0;
-	AverageServiceTime = 0;
-	AverageWaitingTime = 0;
-	NumofRestMotors = 0;
-	
-	
-}
 
-void Region::HandleOrder(Order * pOrd)
-{
-	switch (pOrd->GetType())
-	{
-	case TYPE_NRM: NormalOrders.InsertEnd(pOrd);
-		NormalOrder++;
-		break;
-	case TYPE_FROZ: FrozenOrders.enqueue(pOrd); 
-		FrozenOrder++;
-		break;
-	case TYPE_VIP: VIPQueue.enqueue(pOrd); 
-		VIPOrder++;
-		break;
-	}
-}
 
-void Region::CreateMotorcycle(int Speed, MC_TYPE type, int NumberofMC)
+Region::Region(): PromotionLimit(0), AvgWaitingTime(0), AvgServiceTime(0), NumNormal(0), NumVIP(0), NumFrozen(0),
+NumNormalMotors(0), NumFrozenMotors(0), NumFastMotors(0), NumRestingMotors(0)
 {
-	switch (type) {
-	case FROZEN:
-		for (int i = 0; i < NumberofMC; i++)
-		{
-			FrozenMotorCycles.enqueue(new Motorcycle(Speed,type , FrozenMotorcycle));
-			FrozenMotorcycle++;
-		}
-		break;
-	case NORMAL:
-		for (int i = 0; i < NumberofMC; i++)
-		{
-			NormalMotorCycles.enqueue(new Motorcycle(Speed,type, NormalMotorCycle + FrozenMotorcycle));
-			NormalMotorCycle++;
-		}
-		break;
-	case FAST:
-		for (int i = 0; i < NumberofMC; i++)
-		{
-			FastMotorCycles.enqueue(new Motorcycle(Speed,type , FastMotorCycle + NormalMotorCycle + FrozenMotorcycle));
-			FastMotorCycle++;
-		}
-		break;
-	}
-}
-
-void Region::OrdersDone(int & Normal)
-{
-	Normal = FinishedOrders.GetCount();
 }
 
 
-
-void Region::AssignVIPToMotorCycles(int ts)
+Region::~Region()
 {
-	while (VIPOrder != 0 && (FastMotorCycles.isEmpty()==false || NormalMotorCycles.isEmpty()==false || FrozenMotorCycles.isEmpty()==false))
-	{
-
-		for (int i = 0; i < VIPOrder; i++)
-		{
-			Order* pOrd = NULL;
-			Motorcycle* A = NULL;
-			if (FastMotorCycles.isEmpty() == false)
-			{
-				VIPQueue.dequeue(pOrd);
-				FastMotorCycles.dequeue(A);
-				FastMotorCycle--;
-				A->SetOrdAndMotor(pOrd);
-				VIPOrder--;
-				pOrd->SetWaitingTime(ts);
-				A->SetRestingTime();
-				A->SetOrderServiceTime();
-				InServiceMC.enqueue(A);
-			}
-			else if (NormalMotorCycles.isEmpty() == false)
-			{
-				VIPQueue.dequeue(pOrd);
-				NormalMotorCycles.dequeue(A);
-				NormalMotorCycle--;
-				A->SetOrdAndMotor(pOrd);
-				VIPOrder--;
-				pOrd->SetWaitingTime(ts);
-				A->SetRestingTime();
-				A->SetOrderServiceTime();
-				InServiceMC.enqueue(A);
-			}
-			else if (FrozenMotorCycles.isEmpty() == false)
-			{
-				VIPQueue.dequeue(pOrd);
-				FrozenMotorCycles.dequeue(A);
-				FrozenMotorcycle--;
-				A->SetOrdAndMotor(pOrd);
-				VIPOrder--;
-				pOrd->SetWaitingTime(ts);
-				A->SetOrderServiceTime();
-				A->SetRestingTime();
-				InServiceMC.enqueue(A);
-			}
-		}
-	}
-	
-	
 }
 
-void Region::AssignNormalToMotorCycles(int ts)
+void Region::SetPromotionLimit(int ts)
 {
-	while (NormalOrder != 0 && (NormalMotorCycles.isEmpty() == false || FastMotorCycles.isEmpty() == false))
-	{
-		for (int i = 0; i < NormalOrder; i++)
-		{
-			Order* pOrd = NULL;
-			Motorcycle* A = NULL;
-			if (NormalMotorCycles.isEmpty() == false)
-			{
-
-				NormalOrders.PeekHead(pOrd);
-				NormalMotorCycles.dequeue(A);
-				NormalMotorCycle--;
-				A->SetOrdAndMotor(pOrd);
-				NormalOrder--;
-				pOrd->SetWaitingTime(ts);
-				A->SetRestingTime();
-				A->SetOrderServiceTime();
-				InServiceMC.enqueue(A);
-			}
-
-
-			else if (FastMotorCycles.isEmpty() == false)
-			{
-				pOrd = NormalOrders.GetItem(pOrd->GetID());
-				NormalOrders.Remove(pOrd);
-				NormalMotorCycles.dequeue(A);
-				NormalMotorCycle--;
-				A->SetOrdAndMotor(pOrd);
-				NormalOrder--;
-				pOrd->SetWaitingTime(ts);
-				A->SetRestingTime();
-				A->SetOrderServiceTime();
-				InServiceMC.enqueue(A);
-			}
-		}
-	}
-}
-			
-			
-void Region::AssignMotorFrzoenToCycles(int ts)
-{
-	while (FrozenOrder != 0 && FrozenMotorCycles.isEmpty() == false)
-	{
-		Order* pOrd = NULL;
-		Motorcycle* A = NULL;
-		for (int i = 0; i < FrozenOrder; i++)
-		{
-			FrozenOrders.dequeue(pOrd);
-			FrozenMotorCycles.dequeue(A);
-			FrozenMotorcycle--;
-			A->SetOrdAndMotor(pOrd);
-			FrozenOrder--;
-			pOrd->SetWaitingTime(ts);
-			A->SetOrderServiceTime();
-			InServiceMC.enqueue(A);
-			A->SetRestingTime();
-		}
-	}
+	PromotionLimit = ts;
 }
 
-void Region::AssignMotorCycles(int ts)
-{
-
-	AssignVIPToMotorCycles(ts);
-	AssignMotorFrzoenToCycles(ts);
-	AssignNormalToMotorCycles(ts);
-	
-}
-
-bool Region::CancelOrderRegion(int id)
-{
-	Order* pOrd = NormalOrders.GetItem(id);
-	if (pOrd){
-		if (NormalOrders.Remove(pOrd)) {
-			NormalOrder--;
-			return true;
-		}
-	}
-	else return false;
-}
-
-void Region::SetPromotionLimit(int pl)
-{
-	PromotionLimit = pl;
-}
-
-int Region::GetPromotionLimit()
+int Region::GetPromotionLimits() const
 {
 	return PromotionLimit;
 }
 
-Order* Region::Promote(int id, int extraM)
+void Region::AddOrder(Order * pOrd) 
 {
-	Order * pOrd;
-	pOrd=NormalOrders.GetItem(id);
-	if (NormalOrders.Remove(pOrd))
+	switch (pOrd->GetType())
 	{
-		pOrd->SetMoney(pOrd->GetMoney() + extraM);
-		pOrd->setType(TYPE_VIP); // ADDED
-		VIPQueue.enqueue(pOrd);
-		VIPOrder++;
-		NormalOrder--;
-		return pOrd;
+	case TYPE_NRM: 
+		NormalOrders.InsertEnd(pOrd);
+		NumNormal++;
+		break;
+	case TYPE_FROZ: 
+		FrozenOrders.enqueue(pOrd);
+		NumFrozen++;
+		break;
+	case TYPE_VIP: 
+		VipOrders.enqueue(pOrd);
+		NumVIP++;
+		break;
 	}
 }
 
-void Region::TazbeetMakan(int ts)
+bool Region::CancelOrder(int ID)
 {
-	if (InServiceMC.isEmpty()) {
-		return;
-	}
-	Motorcycle*A;
-	InServiceMC.peekFront(A);
-	int x = A->GetFinishTime();
-	while (A->GetFinishTime() == ts && InServiceMC.peekFront(A))
-	{
-		InServiceMC.dequeue(A);
-		RestingMotors.enqueue(A);
-		NumofRestMotors++;
-		FinishedOrders.Add(A->GetOrder());
-		AverageServiceTime += A->GetOrder()->GetServiceTime();
-		AverageWaitingTime += A->GetOrder()->GetWaitingTime();
-
-	}
-}
-
-
-void Region::DistibuteMotors(int ts)
-{
-	if (RestingMotors.isEmpty() == true)
-	{
-		return;
-	}
-	Motorcycle* A;
-	RestingMotors.peekFront(A);
-	if (A->GetFinishTime() + A->GetRestingTime() == ts) {
-		if (A->GetMCType() == NORMAL) {
-
-			RestingMotors.dequeue(A);
-			NormalMotorCycles.enqueue(A);
-			NormalMotorCycle++;
-			NumofRestMotors--;
-
-		}
-		else if (A->GetMCType() == FAST) {
-			RestingMotors.dequeue(A);
-			FastMotorCycles.enqueue(A);
-			FastMotorCycle++;
-			NumofRestMotors--;
-
-
-		}
-		else if (A->GetMCType() == FROZEN) {
-			RestingMotors.dequeue(A);
-			FrozenMotorCycles.enqueue(A);
-			FrozenMotorcycle++;
-			NumofRestMotors--;
-
+	for (auto i = NormalOrders.begin(); i != NormalOrders.end(); i++) {
+		if ((*i)->GetID() == ID) {
+			NormalOrders.Remove((*i));
+			NumNormal--;
+			return true;
 		}
 	}
-	else
-		return;
+	return false;
 }
 
-void Region::AutomaticPromotion()
+bool Region::PromoteOrder(int ID, double Extramny)
 {
-	Order* pOrd;
-	pOrd = NormalOrders.PeekHead2();
+	for (auto i = NormalOrders.begin(); i != NormalOrders.end(); i++) {
+		if ((*i)->GetID() == ID) {
 
-	while (pOrd && (pOrd->GetWaitingTime() > PromotionLimit)) {
-			Promote(pOrd->GetID());
-			pOrd = NormalOrders.PeekHead2();
+			///Removing from normal orders list
+			Order* pOrd = (*i);
+			NormalOrders.Remove((pOrd));
+			NumNormal--;
+
+			///Adding to vip orders queue
+			pOrd->IncrementMoney(Extramny);
+			pOrd->SetType(TYPE_VIP);
+			VipOrders.enqueue(pOrd);
+			NumVIP++;
+			return true;
+		}
 	}
-}
-
-
-void Region::GetInfo(string* Order,string* Motorcycle,string*Time)
-{
-	int nc = NormalOrder;
-	int fc = FrozenOrder;
-	int vc = VIPOrder;
-	int tc = nc + fc + vc;
-	char tc1[10];
-	char nc1[10];
-	char vc1[10];
-	char fc1[10];
-	itoa(tc, tc1, 10);
-	itoa(nc, nc1, 10);
-	itoa(vc, vc1, 10);
-	itoa(fc, fc1, 10);
-	*Order += "Orders:" + (string)tc1 + "[Norm:" + (string)nc1 + ", Froz:" + (string)fc1 + " ,VIP:" + (string)vc1 + "]                ";
-
-	char FrozenMotorcycle1[10];
-	char NormalMotorcycle1[10];
-	char FastMotorcycle1[10];
-	int TotalMC = FrozenMotorcycle + FastMotorCycle + NormalMotorCycle;
-	char TotalMC1[10];
-	itoa(FrozenMotorcycle, FrozenMotorcycle1, 10);
-	itoa(NormalMotorCycle, NormalMotorcycle1, 10);
-	itoa(FastMotorCycle, FastMotorcycle1, 10);
-	itoa(TotalMC, TotalMC1, 10);
-	
-	*Motorcycle += "MotorC:" + (string)TotalMC1 + "[Norm:" + (string)NormalMotorcycle1 + ", Froz:" + (string)FrozenMotorcycle1 + ", VIP:" + (string)FastMotorcycle1 + "]           ";
-	//char AverageWaitingTime1[10];
-	//char AverageServiceTime1[10];
-	//itoa(GetAverageWaitingTime(), AverageWaitingTime1, 10);
-	//itoa(GetAverageServiceTime(), AverageServiceTime1, 10);
-	//*Time += "AvG SV Time:" + (string)AverageServiceTime1 + "  AvG WT Time:" + (string)AverageWaitingTime1+"  ";
+	return false;
 }
 
 void Region::IncrementOrdersWT()
 {
 	Order* pOrd;
-	for (int i = 0; i < VIPOrder; i++)
+
+	///For VIP orders 
+	Queue<Order*> temp; // used since the last element in the priority queue doesn't change by deque and enque the same object
+	for (int i = 0; i < NumVIP; i++)
 	{
-		VIPQueue.dequeue(pOrd);
-		pOrd->IncrementWT();
-		VIPQueue.NormalEnqueue(pOrd);
+		VipOrders.dequeue(pOrd);
+		pOrd->IncrementWaitingTime();
+		temp.enqueue(pOrd);
+	}
+	for (int i = 0; i < NumVIP; i++) {
+		temp.dequeue(pOrd);
+		VipOrders.enqueue(pOrd);
+	}
+		
+	///For normal orders
+	for (auto i = NormalOrders.begin(); i != NormalOrders.end(); i++)
+	{
+		(*i)->IncrementWaitingTime();
 	}
 
-	for (int i = 1; i <= NormalOrder; i++)
-	{
-		pOrd = NormalOrders.GetItemByPosition(i);
-		pOrd->IncrementWT();
-	}
-
-	for (int i = 0; i < FrozenOrder; i++)
+	///For frozen orders
+	for (int i = 0; i < NumFrozen; i++)
 	{
 		FrozenOrders.dequeue(pOrd);
-		pOrd->IncrementWT();
+		pOrd->IncrementWaitingTime();
 		FrozenOrders.enqueue(pOrd);
 	}
 }
 
-int Region::GetAverageWaitingTime()
+void Region::CheckInServiceMC(int ts)
 {
-	return AverageWaitingTime / FinishedOrders.GetCount();
+	if (InServiceMC.isEmpty())
+		return;
+
+	Motorcycle* pMotor;
+	while (InServiceMC.peekFront(pMotor) && pMotor->GetFinishTime() == ts )
+	{
+		InServiceMC.dequeue(pMotor);
+		RestingMotors.enqueue(pMotor);
+		pMotor->SetStatus(REST);
+		NumRestingMotors++;
+
+		Order* pOrd = nullptr;
+		pMotor->ReleaseOrder(pOrd);
+		FinishedOrders[pOrd->GetType()].Insert(pOrd);
+		AvgServiceTime += pOrd->GetServTime();
+		AvgWaitingTime += pOrd->GetWaitingTime();
+	}
+}
+
+void Region::CheckRestMC(int ts)
+{
+	if (RestingMotors.isEmpty())
+		return;
+
+	Motorcycle* pMotor;
+	RestingMotors.peekFront(pMotor);
+	if (pMotor->GetFinishTime() + pMotor->GetRestingTime() == ts) {
+		switch (pMotor->GetType()) {
+		case NORMAL:
+				RestingMotors.dequeue(pMotor);
+				NormalMotors.enqueue(pMotor);
+				NumNormalMotors++;
+
+		case FAST:
+				RestingMotors.dequeue(pMotor);
+				FastMotors.enqueue(pMotor);
+				NumFastMotors++;
+
+		case FROZEN:
+				RestingMotors.dequeue(pMotor);
+				FrozenMotors.enqueue(pMotor);
+				NumFrozenMotors++;
+		}
+		pMotor->SetStatus(IDLE);
+		NumRestingMotors--;
+	}
+}
+
+void Region::CreateMotorCycles(ifstream & InputFile)
+{
+	int Number, Speed, ID; // Number is the number of motorcycles of each type : Normal, Frozen & Fast
+
+	InputFile >> Number;
+	for (int i = 0; i < Number; i++)
+	{
+		InputFile >> Speed;
+		ID = NumNormalMotors;
+		NormalMotors.enqueue(new Motorcycle(Speed, NORMAL, ID));
+		NumNormalMotors++;
+	}
+
+	InputFile >> Number;
+	for (int i = 0; i < Number; i++)
+	{
+		InputFile >> Speed;
+		ID = NumNormalMotors + NumFrozenMotors;
+		FrozenMotors.enqueue(new Motorcycle(Speed, FROZEN, ID));
+		NumFrozenMotors++;
+	}
+
+	InputFile >> Number;
+	for (int i = 0; i < Number; i++)
+	{
+		InputFile >> Speed;
+		ID = NumNormalMotors + NumFrozenMotors + NumFastMotors;
+		FastMotors.enqueue(new Motorcycle(Speed, FAST, ID));
+		NumFastMotors++;
+	}
+}
+
+void Region::FillInfo(string * Order, string * Motorcycle)
+{
+	int totalOrders = NumNormal + NumFrozen + NumVIP;
+	char TO[10]; // number of total orders
+	char NO[10]; // number of normal orders 
+	char FO[10]; // number of frozen orders
+	char VO[10]; // number of VIP orders 
+
+	itoa(totalOrders, TO, 10);
+	itoa(NumNormal, NO, 10);
+	itoa(NumFrozen, FO, 10);
+	itoa(NumVIP, VO, 10);
+
+	*Order += "Orders:" + (string)TO + "[Norm: " + (string)NO + ", Froz: " + (string)FO + " ,VIP: " + (string)VO + "]                ";
+
+	int TotalMC = NumFastMotors + NumFrozenMotors + NumNormalMotors;
+	char TotalMotorcycle[10];
+	char FrozenMotorcycle[10];
+	char NormalMotorcycle[10];
+	char FastMotorcycle[10];
+
+	itoa(NumFrozenMotors, FrozenMotorcycle, 10);
+	itoa(NumNormalMotors, NormalMotorcycle, 10);
+	itoa(NumFastMotors, FastMotorcycle, 10);
+	itoa(TotalMC, TotalMotorcycle, 10);
+
+	*Motorcycle += "Motorcycles: " + (string)TotalMotorcycle + "[Norm: " + (string)NormalMotorcycle + 
+		", Froz: " + (string)FrozenMotorcycle + ", VIP:" + (string)FastMotorcycle + "]           ";
+}
+
+void Region::WriteInfo(ofstream & Output)
+{
+	PriorityQueue<Order*, FinishedOrdersComp> FinishedOrdersQueue; // priority queue that sort orders according to their finishing time
+	int NumFinished = GetFinishedOrdersCount();
+
+	// Adding all finished orders to priority queue 
+	for (int i = 0; i < TYPE_CNT; i++) 
+		for (auto j = FinishedOrders[i].begin(); j != FinishedOrders[i].end(); j++)
+			FinishedOrdersQueue.enqueue((*j));
+
+
+	// Printing finished orders
+	Output << "FT\t" << "ID\t" << "AT\t" << "WT\t" << "ST\n";
+	Order* pOrd;
+	for (int i = 0; i < NumFinished; i++) {
+		FinishedOrdersQueue.dequeue(pOrd);
+		Output << pOrd->GetFinishTime() << '\t' << pOrd->GetID() << '\t'
+			<< pOrd->GetArrTime() << '\t' << pOrd->GetWaitingTime() << '\t' << pOrd->GetServTime() << endl ;
+	}
+	Output << endl;
+
+	// Prinitng Statistics
+	Output << "Orders:" << NumFinished << "\t[Norm:  " << FinishedOrders[TYPE_NRM].GetCount() << ", Froz:  " << FinishedOrders[TYPE_FROZ].GetCount() 
+		<< ", VIP:  " << FinishedOrders[TYPE_VIP].GetCount() << "]" << endl;
+
+	int totalMotors = NumFastMotors + NumFrozenMotors + NumNormalMotors;
+	Output << "MotorCycles:" << totalMotors << "\t[Norm:  " << NumNormalMotors << ", Froz:  " << NumFrozenMotors << ", Fast:  " << NumFastMotors << "]" << endl;
+
+	if (NumFinished != 0)
+		Output << "Avg Wait = " << GetAvgWT() << ",\tAvg Serv = " << GetAvgServT() << endl;
+
+}
+
+int Region::GetAvgWT() const
+{
+	return AvgWaitingTime / GetFinishedOrdersCount();
+}
+
+int Region::GetAvgServT() const
+{
+	return AvgServiceTime / GetFinishedOrdersCount();
+}
+
+int Region::GetFinishedOrdersCount() const
+{
+	int NumFinished = 0;
+	for (int i = 0; i < TYPE_CNT; i++)
+		NumFinished += FinishedOrders[i].GetCount();
+
+	return NumFinished;
 }
 
 void Region::printOrders(GUI * pGUI)
 {
 	Order* pOrd;
-	for (int i=0;i<VIPOrder;i++)
+
+	///For VIP orders 
+	Queue<Order*> temp; // used since the last element in the priority queue doesn't change by deque and enque the same object
+	for (int i = 0; i < NumVIP; i++)
 	{
-		VIPQueue.dequeue(pOrd);
+		VipOrders.dequeue(pOrd);
 		pGUI->AddOrderForDrawing(pOrd);
-		//pGUI->UpdateInterface();
-		VIPQueue.NormalEnqueue(pOrd);
+		temp.enqueue(pOrd);
+	}
+	for (int i = 0; i < NumVIP; i++) {
+		temp.dequeue(pOrd);
+		VipOrders.enqueue(pOrd);
 	}
 
-
-	for (int i = 1; i <= NormalOrder; i++)
+	///For normal orders
+	for (auto i = NormalOrders.begin(); i != NormalOrders.end(); i++)
 	{
-		pOrd = NormalOrders.GetItemByPosition(i);
-		pGUI->AddOrderForDrawing(pOrd);
-		//pGUI->UpdateInterface();
+		pGUI->AddOrderForDrawing(*i);
 	}
 
-	for (int i = 0; i < FrozenOrder; i++)
+	///For frozen orders
+	for (int i = 0; i < NumFrozen; i++)
 	{
 		FrozenOrders.dequeue(pOrd);
 		pGUI->AddOrderForDrawing(pOrd);
-		//pGUI->UpdateInterface();
 		FrozenOrders.enqueue(pOrd);
 	}
 }
 
-
-int Region::GetAverageServiceTime()
-{
-	return AverageServiceTime / FinishedOrders.GetCount();
-}
-
-int Region::GetNumberOFFinishedOrders()
-{
-	return FinishedOrders.GetCount();
-}
-
-void Region::WriteFile(ofstream& OutFile)
-{
-	int Normal = 0;
-	int Frozen = 0;
-	int VIP = 0;
-	for (int i = 1; i <= FinishedOrders.GetCount(); i++) {
-		switch (FinishedOrders.GetItemByPosition(i)->GetType()) {
-		case TYPE_NRM:Normal++;
-		case TYPE_VIP:VIP++;
-		case TYPE_FROZ:Frozen++;
-		}
-	}
-	
-	OutFile<< "\tOrders:" << FinishedOrders.GetCount() << "\t[Norm:  " << Normal << ", Froz:  " << Frozen << ", VIP:  " << VIP << "]" << endl;
-	OutFile<<"\tMotorC:"<<FrozenMotorcycle+FastMotorCycle+NormalMotorCycle<<"\t[Norm:  " << NormalMotorCycle << ", Froz:  " << FrozenMotorcycle << ", VIP:  " << FastMotorCycle << "]" << endl;
-	if(FinishedOrders.GetCount()!=0)
-		OutFile << "\tAvg Wait = " << GetAverageWaitingTime() << ",\tAvg Serv = " << GetAverageServiceTime() << endl;
-}
-
-void Region::GetFinishedOrders(FOPQ & finishedOrders)
+void Region::AutomaticPromotion()
 {
 	Order* pOrd;
-	for (int i = 1; i <= FinishedOrders.GetCount(); i++) {
-		pOrd = FinishedOrders.GetItemByPosition(i);
-		finishedOrders.enqueue(pOrd);
+	NormalOrders.PeekHead(pOrd);
+
+	while (pOrd && (pOrd->GetWaitingTime() > PromotionLimit)) {
+		PromoteOrder(pOrd->GetID());
+		NormalOrders.PeekHead(pOrd);
 	}
 }
- 
 
-
-Region::~Region()
+void Region::AssignMotorsToVip(int ts)
 {
+	if (NumVIP == 0 || (FastMotors.isEmpty() && NormalMotors.isEmpty() && FrozenMotors.isEmpty() ))
+		return;
+
+	int numOfOrders = NumVIP;
+	for (int i = 0; i < numOfOrders; i++)
+	{
+		Order* pOrd = NULL;
+		Motorcycle* pMotor = NULL;
+
+		if (FastMotors.isEmpty() == false) //Use fast motors first
+		{
+			VipOrders.dequeue(pOrd);
+			FastMotors.dequeue(pMotor);
+			NumFastMotors--;
+			NumVIP--;
+
+			pOrd->SetWaitingTime(ts);
+			pMotor->SetOrder(pOrd);
+			InServiceMC.enqueue(pMotor);
+			pMotor->SetStatus(SERV);
+		}
+		else if (NormalMotors.isEmpty() == false)
+		{
+			VipOrders.dequeue(pOrd);
+			NormalMotors.dequeue(pMotor);
+			NumNormalMotors--;
+			NumVIP--;
+
+			pOrd->SetWaitingTime(ts);
+			pMotor->SetOrder(pOrd);
+			InServiceMC.enqueue(pMotor);
+			pMotor->SetStatus(SERV);
+		}
+		else if ( FrozenMotors.isEmpty() == false)
+		{
+			VipOrders.dequeue(pOrd);
+			FrozenMotors.dequeue(pMotor);
+			NumFrozenMotors--;
+			NumVIP--;
+
+			pOrd->SetWaitingTime(ts);
+			pMotor->SetOrder(pOrd);
+			InServiceMC.enqueue(pMotor);
+			pMotor->SetStatus(SERV);
+		}
+	}
+}
+
+void Region::AssignMotorsToNormal(int ts)
+{
+	if (NumNormal == 0 || (NormalMotors.isEmpty() && FastMotors.isEmpty()))
+		return;
+
+	int numOfOrders = NumNormal;
+	for (int i = 0; i < numOfOrders; i++)
+	{
+		Order* pOrd = NULL;
+		Motorcycle* pMotor = NULL;
+
+		if (NormalMotors.isEmpty() == false)
+		{
+			NormalOrders.PopHead(pOrd);
+			NormalMotors.dequeue(pMotor);
+			NumNormalMotors--;
+			NumNormal--;
+
+			pOrd->SetWaitingTime(ts);
+			pMotor->SetOrder(pOrd);
+			InServiceMC.enqueue(pMotor);
+			pMotor->SetStatus(SERV);
+		}
+
+		else if (FastMotors.isEmpty() == false)
+		{
+			NormalOrders.PopHead(pOrd);
+			FastMotors.dequeue(pMotor);
+			NumFastMotors--;
+			NumNormal--;
+
+			pOrd->SetWaitingTime(ts);
+			pMotor->SetOrder(pOrd);
+			InServiceMC.enqueue(pMotor);
+			pMotor->SetStatus(SERV);
+		}
+	}
+}
+
+void Region::AssignMotorsToFrozen(int ts)
+{
+	if (NumFrozen == 0 || FrozenMotors.isEmpty())
+		return;
+
+	Order* pOrd = NULL;
+	Motorcycle*pMotor = NULL;
+	int numOfOrders = NumFrozen;
+	for (int i = 0; i < numOfOrders; i++)
+	{
+		FrozenOrders.dequeue(pOrd);
+		FrozenMotors.dequeue(pMotor);
+		NumFrozenMotors--;
+		NumFrozen--;
+
+		pOrd->SetWaitingTime(ts);
+		pMotor->SetOrder(pOrd);
+		InServiceMC.enqueue(pMotor);
+		pMotor->SetStatus(SERV);
+	}
+
+}
+
+void Region::AssignMotorCycles(int ts)
+{
+	AssignMotorsToVip(ts);
+	AssignMotorsToFrozen(ts);
+	AssignMotorsToNormal(ts);
 }

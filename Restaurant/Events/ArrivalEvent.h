@@ -3,25 +3,31 @@
 
 #include "Event.h"
 
-
-//class for the arrival event
 class ArrivalEvent: public Event
 {
-	//info about the order ralted to arrival event
-	int OrdDistance;	//order distance
-	ORD_TYPE OrdType;		//order type: Normal, Frozen, VIP
-	REGION OrdRegion;  //Region of this order	                
+	int OrdDistance;	//Order distance
+	ORD_TYPE OrdType;	//Order type: Normal, Frozen, VIP
+	REGION OrdRegion;	//Region of this order	                
 	double OrdMoney;	//Total order money
 public:
-	ArrivalEvent(int eTime, int oID, ORD_TYPE oType, REGION reg, int distance, double money);
-	//Add more constructors if needed
-	ORD_TYPE getOrderType() const;
-	int GetDist() const;
+	ArrivalEvent(int eTime, int oID, ORD_TYPE typ, REGION reg);
+	ArrivalEvent(int eTime, int oID, ORD_TYPE typ, REGION reg, int dist, double mny);
+
+	// Creates and order and and fills its data and pass it to restaurant object 
+	virtual void Execute(Restaurant *pRest); 	
+
+	int GetOrdDistance() const;
+	bool SetOrdDistance(int dist);
+
+	ORD_TYPE GetOrdType() const;
+	bool SetOrdType(ORD_TYPE typ);
+
+	REGION GetOrdRegion() const;
+	bool SetOrdRegion(REGION reg);
+
 	double GetOrdMoney() const;
+	bool SetOrdMoney(double mny);
 
-	virtual void Execute(Restaurant *pRest);	//override execute function
-
-
-};
+}; // end ArrivalEvent
 
 #endif

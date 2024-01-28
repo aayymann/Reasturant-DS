@@ -1,74 +1,42 @@
 #include "Order.h"
-#include<iostream>
-using namespace std;
 
-Order::Order(int id, ORD_TYPE r_Type, REGION r_region, int distance, double money)
+Order::Order(int oID, ORD_TYPE r_Type, REGION r_region, int distance, double mny)
 {
-	ID = (id>0&&id<1000)?id:0;	//1<ID<999
+	ID = (oID>0&&oID<1000)?oID:0;	//1<ID<999
 	type = r_Type;
 	Region = r_region;	
-	WaitingTime = 0;
 	Distance = distance;
-	totalMoney = money;
-}
-
-Order::Order()
-{
+	totalMoney = (mny > 0) ? mny : 0;
 }
 
 Order::~Order()
 {
 }
 
-int Order::GetID()
+int Order::GetID() const
 {
 	return ID;
 }
-void Order::SetArrtime(int ts)
+
+void Order::SetID(int oID)
 {
-	ArrTime = ts;
-}
-void Order :: setRegion(REGION r_region)
-{
-	Region = r_region;
-}
-void Order :: setType(ORD_TYPE r)
-{
-	type = r;
+	ID = oID;
 }
 
-void Order :: setID(int id)
-{
-	ID = id;
-}
+
 int Order::GetType() const
 {
 	return type;
 }
 
-REGION Order::GetRegion() const
-{
-	return Region;
-}
-
-void Order::SetWaitingTime(int AssignMotorT)
-{
-	WaitingTime =   AssignMotorT- ArrTime;
-}
-
-void Order::IncrementWT()
-{
-	WaitingTime++;
-}
-
-void Order::SetServiceTime(int ts)
-{
-	ServTime = ts;
-}
-
-int Order::GetArrivalTime() const
+int Order::GetArrTime() const
 {
 	return ArrTime;
+}
+
+int Order::GetServTime() const
+{
+	return ServTime;
 }
 
 int Order::GetWaitingTime() const
@@ -76,24 +44,49 @@ int Order::GetWaitingTime() const
 	return WaitingTime;
 }
 
-int Order::GetServiceTime()
-{
-	return ServTime;
-}
-
 int Order::GetFinishTime() const
 {
 	return ArrTime + ServTime + WaitingTime;
 }
 
-void Order::SetFinishTime()
+void Order::SetType(ORD_TYPE r)
 {
-	FinishTime = ArrTime+ServTime+WaitingTime;
+	type = r;
 }
 
-void Order::SetMoney(double mny)
+void Order::SetArrtime(int ts)
 {
-	totalMoney = mny;
+	ArrTime = ts;
+}
+
+void Order::SetServTime(int ts)
+{
+	ServTime = ts;
+}
+
+void Order::SetWaitingTime(int ts)
+{
+	WaitingTime = ArrTime - ts;
+}
+
+void Order::IncrementWaitingTime()
+{
+	WaitingTime++;
+}
+
+void Order::IncrementMoney(double mny)
+{
+	totalMoney += mny;
+}
+
+REGION Order::GetRegion() const
+{
+	return Region;
+}
+
+void Order::SetRegion(REGION r_region)
+{
+	Region = r_region;
 }
 
 void Order::SetDistance(int d)
@@ -110,10 +103,8 @@ double Order::GetMoney() const
 {
 	return totalMoney;
 }
-/*
-void Order::Print()
+
+void Order::SetMoney(double mny)
 {
-	cout << totalMoney << endl;
-	cout << Distance << endl;
+	totalMoney = mny;
 }
-*/

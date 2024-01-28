@@ -1,13 +1,14 @@
-#pragma once
-#include<iostream>
-using namespace std;
-#include "Events/Event.h"
-#include "Rest\Restaurant.h"
+#ifndef __PROMOTION_EVENT_H_
+#define __PROMOTION_EVENT_H_
 
-class PromotionEvent :public Event {
-private:
-	int ExtraMoney;
+#include "Events/Event.h"
+class PromotionEvent : public Event
+{
+	double ExtraMoney;
 public:
-	PromotionEvent(int Ts, int ID, int Extramoney);
+	PromotionEvent(int eTime, int ID, double Extramoney);
 	virtual void Execute(Restaurant* pRest);
-};
+	virtual ~PromotionEvent();
+}; // end PromotionEvent
+
+#endif 

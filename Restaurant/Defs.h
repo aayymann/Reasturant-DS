@@ -21,33 +21,32 @@ enum ORD_TYPE	//types of orders
 
 };
 
-enum STATUS	//status of motorcycles
+enum MOTOR_TYPE	//types of Motorcycles
 {
-	IDLE,	//idle ==> waiting to be assigned at order
-	SERV	//is-service ==> is delivering at order but hasn't returned yet.
+	NORMAL,			//normal 
+	FROZEN,			//frozen
+	FAST,			//fast
+	MOTOR_TYPE_CNT	//Number of types
 };
 
-enum MC_TYPE
+enum STATUS	//status of motorcycles
 {
-	FROZEN,
-	NORMAL,
-	FAST
+	IDLE,	//Waiting to be assigned at order
+	SERV,	//Delivering an order but hasn't returned yet.
+	REST, //Resting from last delivery 
 };
+
 
 enum PROG_MODE	//mode of the program interface
 {
 	MODE_INTR,	//interactive mode
 	MODE_STEP,	//Step-by-step mode
 	MODE_SLNT,	//Silent mode
-	MODE_DEMO,	//Demo mode (for introductory phase only, should be removed in phases 1&2)
 	MODE_CNT	//number of possible modes
 };
 
 
-#define MaxPossibleOrdCnt 999	//arbitrary value
-
-
-
-
+constexpr int MaxPossibleOrdCnt = 999; 
+constexpr char letters[26] = { 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z' }; // Used for regions
 
 #endif
